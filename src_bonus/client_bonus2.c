@@ -9,17 +9,19 @@
 /*   Updated: 2024/02/07 12:45:42 by aarbenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <errno.h>
 #include "../include/minitalk.h"
 
-volatile sig_atomic_t	g_confirmation_received = 0;
+volatile int	g_confirmation_received = 0;
 
-static void	confirmation_handler(int sig, siginfo_t *info, void *context)
+void	confirmation_handler(int sig, siginfo_t *info, void *context)
 {
-	(void)context;
 	(void)info;
-	if (sig == SIGUSR1)
+	(void)context;
+	if (sig == SIGUSR1 || sig == SIGUSR2)
+	{
 		g_confirmation_received = 1;
+		write(1, "confirmation received\n", 23);
+	}
 }
 
 void	handle_error(int signal)
@@ -28,33 +30,33 @@ void	handle_error(int signal)
 		write(STDERR_FILENO, "Error sending SIGUSR1\n", 23);
 	else if (signal == SIGUSR2)
 		write(STDERR_FILENO, "Error sending SIGUSR2\n", 23);
-	exit(EXIT_FAILURE);
+	exit(1);
 }
 
-static void	send_char(int pid, int character, size_t *str_len)
+void	send_char(char c, int pid)
 {
-	int	counter;
-	int	bit;
+	static int	i;
+	int			bit;
 
-	counter = 0;
-	while (counter <= 7)
+	i = 7;
+	while (i >= 0)
 	{
-		bit = (character >> counter) & 1;
-		if (bit)
-		{
-			if (kill(pid, SIGUSR2) == -1)
-				handle_error(SIGUSR2);
-		}
-		else
+		bit = ((c) >> i) & 1;
+		if (bit == 0)
 		{
 			if (kill(pid, SIGUSR1) == -1)
 				handle_error(SIGUSR1);
 		}
-		counter++;
-		while (g_confirmation_received != 1)
-			;
+		else
+		{
+			if (kill(pid, SIGUSR2) == -1)
+				handle_error(SIGUSR2);
+		}
+		i--;
+		while (!g_confirmation_received)
+			pause();
 		g_confirmation_received = 0;
-		(*str_len)++;
+		usleep(1000);
 	}
 }
 
@@ -77,34 +79,33 @@ void	validate_args(int argc, char **argv)
 		}
 		i++;
 	}
-	if (ft_atoi(argv[1]) <= 0 || kill(ft_atoi(argv[1]), 0) == -1)
+	if (ft_atoi(argv[1]) <= 0)
 	{
-		write (STDERR_FILENO, "PID error\n", 39);
+		write (STDERR_FILENO, "Invalid PID, use number bigger then 0\n", 39);
 		exit(1);
 	}
 }
 
 int	main(int argc, char **argv)
 {
-	struct sigaction	sa;
-	int					i;
-	size_t				str_len;
-	char				*str;
 	int					pid;
+	int					i;
+	char				*str;
+	struct sigaction	sa;
 
 	validate_args(argc, argv);
-	str = argv[2];
-	pid = ft_atoi(argv[1]);
-	sa.sa_flags = SA_SIGINFO;
-	sa.sa_sigaction = confirmation_handler;
-	sigemptyset(&sa.sa_mask);
-	sigaction(SIGUSR1, &sa, NULL);
 	i = 0;
-	str_len = 0;
-	ft_printf("client PID: %d\n", getpid());
+	pid = atoi(argv[1]);
+	str = argv[2];
+	sa.sa_sigaction = &confirmation_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	while (str[i])
-		send_char(pid, str[i++], &str_len);
-	send_char(pid, str[i], &str_len);
-	ft_printf("Server received %u bits, %u characters\n", str_len, str_len / 8);
+	{
+		send_char(str[i], pid);
+		i++;
+	}
 	return (0);
 }
