@@ -61,8 +61,12 @@ int	main(void)
 	sa.sa_handler = &handle_signal;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	sigaction(SIGUSR1, &sa, NULL);
-	sigaction(SIGUSR2, &sa, NULL);
+	if (sigaction(SIGUSR1, &sa, NULL) == -1 || \
+	sigaction(SIGUSR2, &sa, NULL) == -1)
+	{
+		write(STDERR_FILENO, "Error handling signal\n", 23);
+		exit(EXIT_FAILURE);
+	}
 	ft_printf("My PID: %d\n", getpid());
 	ft_printf("Waiting for signal...\n");
 	while (1)

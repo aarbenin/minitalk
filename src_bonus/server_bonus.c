@@ -69,9 +69,9 @@ int	main(void)
 	sigaddset(&sa.sa_mask, SIGUSR1);
 	sigaddset(&sa.sa_mask, SIGUSR2);
 	if (sigaction(SIGUSR1, &sa, NULL) == -1 || \
-	sigaction(SIGUSR2, &sa, NULL) == -1)
+		sigaction(SIGUSR2, &sa, NULL) == -1)
 	{
-		ft_printf("Error handling signal\n");
+		write(STDERR_FILENO, "Error handling signal\n", 25);
 		exit(EXIT_FAILURE);
 	}
 	ft_printf("My PID: %d\n", getpid());

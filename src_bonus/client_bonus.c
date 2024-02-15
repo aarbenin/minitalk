@@ -66,7 +66,7 @@ void	validate_args(int argc, char **argv)
 	if (argc != 3)
 	{
 		write(STDERR_FILENO, "Usage: <pid> <message>\n", 24);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	i = 0;
 	while (argv[1][i])
@@ -74,14 +74,14 @@ void	validate_args(int argc, char **argv)
 		if (!ft_isdigit(argv[1][i]))
 		{
 			write(STDERR_FILENO, "Invalid PID, use only digits\n", 30);
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		i++;
 	}
 	if (ft_atoi(argv[1]) <= 0 || kill(ft_atoi(argv[1]), 0) == -1)
 	{
 		write (STDERR_FILENO, "PID error\n", 39);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 

@@ -17,7 +17,7 @@ void	handle_error(int signal)
 		write(STDERR_FILENO, "Error sending SIGUSR1\n", 23);
 	else if (signal == SIGUSR2)
 		write(STDERR_FILENO, "Error sending SIGUSR2\n", 23);
-	exit(1);
+	exit(EXIT_FAILURE);
 }
 
 void	send_char(int pid, int character, size_t *str_len)
@@ -53,7 +53,7 @@ void	validate_args(int argc, char **argv)
 	if (argc != 3)
 	{
 		write(STDERR_FILENO, "Usage: <pid> <message>\n", 24);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	i = 0;
 	while (argv[1][i])
@@ -61,14 +61,14 @@ void	validate_args(int argc, char **argv)
 		if (!ft_isdigit(argv[1][i]))
 		{
 			write(STDERR_FILENO, "Invalid PID, use only digits\n", 30);
-			exit(1);
+			exit(EXIT_FAILURE);
 		}
 		i++;
 	}
 	if (ft_atoi(argv[1]) <= 0 || kill(ft_atoi(argv[1]), 0) == -1)
 	{
 		write (STDERR_FILENO, "PID error\n", 39);
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 
