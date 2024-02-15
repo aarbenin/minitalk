@@ -102,7 +102,6 @@ int	main(int argc, char **argv)
 	sigaction(SIGUSR1, &sa, NULL);
 	i = 0;
 	str_len = 0;
-	ft_printf("client PID: %d\n", getpid());
 	while (str[i])
 		send_char(pid, str[i++], &str_len);
 	send_char(pid, 0, &str_len);

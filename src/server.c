@@ -11,23 +11,46 @@
 /* ************************************************************************** */
 #include "../include/minitalk.h"
 
+void	collect_str(unsigned char c)
+{
+	static unsigned char	str[1024];
+	static int				i;
+
+	if (c != '\0')
+	{
+		str[i++] = c;
+		if (i == 1023)
+		{
+			str[i] = '\0';
+			write(1, str, i);
+			i = 0;
+		}
+	}
+	else
+	{
+		if (i > 0)
+		{
+			str[i] = '\0';
+			write(1, str, i);
+			i = 0;
+		}
+		write(1, "\n", 1);
+	}
+}
+
 void	handle_signal(int sig)
 {
 	static unsigned char	current_byte;
-	static int				counter;
-	int						bit;
+	static int				bit_counter;
 
-	if (sig == SIGUSR1)
-		bit = 0;
-	else
-		bit = 1;
-	current_byte = (current_byte << 1) | bit;
-	counter++;
-	if (counter == 8)
+	if (sig == SIGUSR2)
+		current_byte |= (1 << bit_counter);
+	bit_counter++;
+	if (bit_counter == 8)
 	{
-		write(1, &current_byte, 1);
+		collect_str(current_byte);
 		current_byte = 0;
-		counter = 0;
+		bit_counter = 0;
 	}
 }
 
@@ -37,7 +60,7 @@ int	main(void)
 
 	sa.sa_handler = &handle_signal;
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_SIGINFO;
+	sa.sa_flags = 0;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
 	ft_printf("My PID: %d\n", getpid());

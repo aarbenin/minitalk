@@ -20,28 +20,30 @@ void	handle_error(int signal)
 	exit(1);
 }
 
-void	send_char(char c, int pid)
+void	send_char(int pid, int character, size_t *str_len)
 {
-	static int	i;
+	static int	counter;
 	int			bit;
 
-	i = 7;
-	while (i >= 0)
+	counter = 0;
+	while (counter <= 7)
 	{
-		bit = ((c) >> i) & 1;
-		if (bit == 0)
-		{
-			if (kill(pid, SIGUSR1) == -1)
-				handle_error(SIGUSR1);
-		}
-		else
+		bit = (character >> counter) & 1;
+		if (bit)
 		{
 			if (kill(pid, SIGUSR2) == -1)
 				handle_error(SIGUSR2);
 		}
-		i--;
-		usleep(500);
+		else
+		{
+			if (kill(pid, SIGUSR1) == -1)
+				handle_error(SIGUSR1);
+		}
+		counter++;
+		usleep(100);
 	}
+	if (character != 0)
+		(*str_len)++;
 }
 
 int	main(int argc, char **argv)
@@ -49,6 +51,7 @@ int	main(int argc, char **argv)
 	int		pid;
 	int		i;
 	char	*str;
+	size_t	str_len;
 
 	if (argc != 3)
 	{
@@ -64,9 +67,7 @@ int	main(int argc, char **argv)
 	}
 	str = argv[2];
 	while (str[i])
-	{
-		send_char(str[i], pid);
-		i++;
-	}
+		send_char(pid, str[i++], &str_len);
+	send_char(pid, 0, &str_len);
 	return (0);
 }
