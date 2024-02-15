@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 #include "../include/minitalk.h"
 
-static volatile sig_atomic_t	g_sig_state[2] = {};
+static t_server_state	g_state = {0};
 
 void	collect_str(unsigned char c)
 {
@@ -21,8 +21,9 @@ void	collect_str(unsigned char c)
 	if (c != '\0')
 	{
 		str[i++] = c;
-		if (i == 1024)
+		if (i == 1023)
 		{
+			str[i] = '\0';
 			write(1, str, i);
 			i = 0;
 		}
@@ -31,6 +32,7 @@ void	collect_str(unsigned char c)
 	{
 		if (i > 0)
 		{
+			str[i] = '\0';
 			write(1, str, i);
 			i = 0;
 		}
@@ -53,8 +55,8 @@ void	handle_signal(int sig, siginfo_t *info, void *context)
 		current_byte = 0;
 		bit_counter = 0;
 	}
-	g_sig_state[0] = 1;
-	g_sig_state[1] = info->si_pid;
+	g_state.signal_received = 1;
+	g_state.client_pid = info->si_pid;
 }
 
 int	main(void)
@@ -69,17 +71,17 @@ int	main(void)
 	if (sigaction(SIGUSR1, &sa, NULL) == -1 || \
 	sigaction(SIGUSR2, &sa, NULL) == -1)
 	{
-		ft_printf("Error handling signal/n");
+		ft_printf("Error handling signal\n");
 		exit(EXIT_FAILURE);
 	}
 	ft_printf("My PID: %d\n", getpid());
 	ft_printf("Waiting for signal...\n");
 	while (1)
 	{
-		while (!g_sig_state[0])
+		while (!g_state.signal_received)
 			;
-		g_sig_state[0] = 0;
-		kill(g_sig_state[1], SIGUSR1);
+		g_state.signal_received = 0;
+		kill(g_state.client_pid, SIGUSR1);
 	}
 	return (0);
 }

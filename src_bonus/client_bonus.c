@@ -54,8 +54,9 @@ static void	send_char(int pid, int character, size_t *str_len)
 		while (g_confirmation_received != 1)
 			;
 		g_confirmation_received = 0;
-		(*str_len)++;
 	}
+	if (character != 0)
+		(*str_len)++;
 }
 
 void	validate_args(int argc, char **argv)
@@ -104,7 +105,7 @@ int	main(int argc, char **argv)
 	ft_printf("client PID: %d\n", getpid());
 	while (str[i])
 		send_char(pid, str[i++], &str_len);
-	send_char(pid, str[i], &str_len);
-	ft_printf("Server received %u bits, %u characters\n", str_len, str_len / 8);
+	send_char(pid, 0, &str_len);
+	ft_printf("Server received %u bytes\n", str_len);
 	return (0);
 }
