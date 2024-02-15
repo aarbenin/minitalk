@@ -79,7 +79,7 @@ int	main(void)
 	while (1)
 	{
 		while (!g_state.signal_received)
-			;
+			usleep(150);
 		g_state.signal_received = 0;
 		kill(g_state.client_pid, SIGUSR1);
 	}

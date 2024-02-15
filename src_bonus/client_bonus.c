@@ -52,7 +52,7 @@ static void	send_char(int pid, int character, size_t *str_len)
 		}
 		counter++;
 		while (g_confirmation_received != 1)
-			;
+			usleep(150);
 		g_confirmation_received = 0;
 	}
 	if (character != 0)
@@ -105,6 +105,6 @@ int	main(int argc, char **argv)
 	while (str[i])
 		send_char(pid, str[i++], &str_len);
 	send_char(pid, 0, &str_len);
-	ft_printf("Server received %u bytes\n", str_len);
+	ft_printf("Server received %u bytes (from PID %u)\n", str_len, getpid());
 	return (0);
 }
