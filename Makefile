@@ -19,7 +19,7 @@ LIBFT_LIB = $(LIBFT)/libft.a
 
 all: $(NAME)
 
-$(NAME): $(OBJ_CLIENT) $(OBJ_SERVER) $(LIBFT_LIB)
+$(NAME): $(LIBFT_LIB) $(OBJ_CLIENT) $(OBJ_SERVER)
 	$(CC) $(CFLAGS) -o client $(OBJ_CLIENT) -L$(LIBFT) -lft
 	$(CC) $(CFLAGS) -o server $(OBJ_SERVER) -L$(LIBFT) -lft
 
@@ -28,7 +28,7 @@ $(LIBFT_LIB):
 
 bonus: $(BONUS_NAME)
 
-$(BONUS_NAME): $(OBJ_BONUS_CLIENT) $(OBJ_BONUS_SERVER) $(LIBFT_LIB)
+$(BONUS_NAME): $(LIBFT_LIB) $(OBJ_BONUS_CLIENT) $(OBJ_BONUS_SERVER)
 	$(CC) $(CFLAGS) -o client_bonus $(OBJ_BONUS_CLIENT) -L$(LIBFT) -lft
 	$(CC) $(CFLAGS) -o server_bonus $(OBJ_BONUS_SERVER) -L$(LIBFT) -lft
 

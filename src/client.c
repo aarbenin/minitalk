@@ -20,7 +20,7 @@ void	handle_error(int signal)
 	exit(EXIT_FAILURE);
 }
 
-void	send_char(int pid, int character, size_t *str_len)
+void	send_char(int pid, int character)
 {
 	int	counter;
 	int	bit;
@@ -42,8 +42,6 @@ void	send_char(int pid, int character, size_t *str_len)
 		counter++;
 		usleep(100);
 	}
-	if (character != 0)
-		(*str_len)++;
 }
 
 void	validate_args(int argc, char **argv)
@@ -77,15 +75,13 @@ int	main(int argc, char **argv)
 	int		pid;
 	int		i;
 	char	*str;
-	size_t	str_len;
 
 	validate_args(argc, argv);
-	str_len = 0;
 	pid = ft_atoi(argv[1]);
 	str = argv[2];
 	i = 0;
 	while (str[i])
-		send_char(pid, str[i++], &str_len);
-	send_char(pid, 0, &str_len);
+		send_char(pid, str[i++]);
+	send_char(pid, 0);
 	return (0);
 }

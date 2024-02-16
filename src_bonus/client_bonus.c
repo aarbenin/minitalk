@@ -9,7 +9,6 @@
 /*   Updated: 2024/02/07 12:45:42 by aarbenin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <errno.h>
 #include "../include/minitalk.h"
 
 volatile sig_atomic_t	g_confirmation_received = 0;

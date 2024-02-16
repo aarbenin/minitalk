@@ -21,6 +21,6 @@ typedef struct s_server_state
 {
 	volatile sig_atomic_t	signal_received;
 	int						client_pid;
-}				t_server_state;
+}			t_server_state;
 
 #endif

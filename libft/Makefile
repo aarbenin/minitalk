@@ -48,21 +48,20 @@ SRCS = ft_isalpha.c \
 	./printf/ft_printf_utils.c
 
 OBJS = $(SRCS:.c=.o)
-BONUS_OBJS = $(BONUS_SRCS:.c=.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	ar rcs $(NAME) $^
+	@ar rcs $(NAME) $^
 
 %.o: %.c
-	gcc $(CFLAGS) -c $< -o $@
+	@gcc $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(BONUS_OBJS)
+	@rm -f $(OBJS)
 
 fclean: clean
-	rm -f $(NAME) .bonus
+	@rm -f $(NAME) .bonus
 
 re: fclean all
 
